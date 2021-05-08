@@ -86,6 +86,14 @@ from cliente
 where codcliente in (SELECT fk_cliente_codcliente 
 					 FROM pedido 
 					 WHERE cliente.codcliente = pedido.fk_cliente_codcliente)
+					 
+
+CREATE OR REPLACE VIEW CadastroProduto AS
+SELECT fk_categoria_codcategoria_pk, nome, preco
+from produto
+
+INSERT INTO cadastroproduto values (6,'Caldo de Cana 400ml', 5.00)
+
 
 
 

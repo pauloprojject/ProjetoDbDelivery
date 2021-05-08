@@ -2,10 +2,9 @@ select * from categoria; --ok
 select * from cliente; --ok
 select * from compoe; 
 select * from funcionario; --ok
-select * from gerencia; 
 select * from motoboy; --ok
-select * from pedido;
-select * from preparado;
+select * from pedido; --ok
+select * from preparado; --ok
 select * from produto; --ok
 select * from telefone; --ok
 
@@ -65,7 +64,31 @@ INSERT INTO produto (fk_categoria_codcategoria_pk, estoque, nome) VALUES (5,5, '
 INSERT INTO produto (fk_categoria_codcategoria_pk, estoque, nome) VALUES (5,5, 'X-Egg');
 INSERT INTO produto (fk_categoria_codcategoria_pk, estoque, nome) VALUES (5,5, 'X-Tudo');
 
+INSERT INTO 
+pedido (fk_cliente_codcliente, fk_motoboy_codmotoboy, fk_funcionario_codfuncionario, data, status, taxa_entrega) 
+VALUES (1,1,1,current_timestamp, 'Em preparo', 10);
+INSERT INTO 
+pedido (fk_cliente_codcliente, fk_motoboy_codmotoboy, fk_funcionario_codfuncionario, data, status, taxa_entrega) 
+VALUES (2,1,1,current_timestamp, 'Em preparo', 8.00);
+INSERT INTO 
+pedido (fk_cliente_codcliente, fk_motoboy_codmotoboy, fk_funcionario_codfuncionario, data, status, taxa_entrega) 
+VALUES (2,2,2,current_timestamp, 'Em preparo', 8.00);
+INSERT INTO 
+pedido (fk_cliente_codcliente, fk_motoboy_codmotoboy, fk_funcionario_codfuncionario, data, status, taxa_entrega) 
+VALUES (3,2,2,current_timestamp, 'Em preparo', 20.00);
+INSERT INTO 
+pedido (fk_cliente_codcliente, fk_motoboy_codmotoboy, fk_funcionario_codfuncionario, data, status, taxa_entrega) 
+VALUES (5,2,1,current_timestamp, 'Em preparo', 9.00);
 
+INSERT INTO preparado (fk_funcionario_codfuncionario, fk_pedido_codpedido) VALUES (1,1);
+INSERT INTO preparado (fk_funcionario_codfuncionario, fk_pedido_codpedido) VALUES (1,2);
+INSERT INTO preparado (fk_funcionario_codfuncionario, fk_pedido_codpedido) VALUES (1,3);
+INSERT INTO preparado (fk_funcionario_codfuncionario, fk_pedido_codpedido) VALUES (1,4);
+INSERT INTO preparado (fk_funcionario_codfuncionario, fk_pedido_codpedido) VALUES (1,5);
+
+
+
+	   
 
 
 

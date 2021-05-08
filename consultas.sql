@@ -77,8 +77,15 @@ select p.codpedido, p.fk_motoboy_codmotoboy, (select m.nome from motoboy m where
 	Where p.fk_motoboy_codmotoboy in (select m.codmotoboy
 									 from motoboy m join pedido p
 									 on p.fk_motoboy_codmotoboy = m.codmotoboy
-									 where m.nome = 'Cachorro_Loko')									 
+									 where m.nome = 'Cachorro_Loko')	
+									 
 
+-- Retorne os dados de todos os clientes que já fizeram pedidos 
+SELECT codcliente, nome, rua, bairro, numero 
+from cliente 
+where codcliente in (SELECT fk_cliente_codcliente 
+					 FROM pedido 
+					 WHERE cliente.codcliente = pedido.fk_cliente_codcliente)
 
 
 

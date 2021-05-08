@@ -94,6 +94,8 @@ from produto
 
 INSERT INTO cadastroproduto values (6,'Caldo de Cana 400ml', 5.00)
 
+s
+
 
 
 

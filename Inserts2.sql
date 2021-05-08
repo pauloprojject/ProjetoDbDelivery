@@ -7,11 +7,17 @@ select * from motoboy; --ok
 select * from pedido;
 select * from preparado;
 select * from produto; --ok
-select * from telefone;
+select * from telefone; --ok
 
 INSERT INTO motoboy (nome) VALUES ('Jefferson')
 INSERT INTO motoboy (nome) VALUES ('Cachorro_Loko')
 INSERT INTO motoboy (nome) VALUES ('Moleque_du_Grau')
+
+INSERT INTO telefone (fone, fk_cliente_codcliente, tipo) VALUES (83988887777,1,'Celular');
+INSERT INTO telefone (fone, fk_cliente_codcliente, tipo) VALUES (83988887766,2,'Celular');
+INSERT INTO telefone (fone, fk_cliente_codcliente, tipo) VALUES (83988887755,3,'Celular');
+INSERT INTO telefone (fone, fk_cliente_codcliente, tipo) VALUES (83988887744,4,'Celular');
+INSERT INTO telefone (fone, fk_cliente_codcliente, tipo) VALUES (83988887733,5,'Celular');
 
 INSERT INTO produto (fk_categoria_codcategoria_pk, estoque, nome) VALUES (1,5, 'Pizza Mista Pequena');
 INSERT INTO produto (fk_categoria_codcategoria_pk, estoque, nome) VALUES (1,5, 'Pizza Mista Média');

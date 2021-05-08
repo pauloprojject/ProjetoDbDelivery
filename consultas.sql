@@ -71,21 +71,13 @@ from motoboy
 order by Identidade
 
 -- 02 consultas que usem subqueries.
-Select codpedido, m.nome
-From motoboy m
-Where m.codmotoboy in ( 
-	
-select p.codpedido, p.fk_motoboy_codmotoboy, (select m.codmotoboy from motoboy m where m.nome = 'Jefferson')
+-- Retorne uma consulta usando subquery dos pedidos que o motoboy 'Cachorro_Loko' entregou	
+select p.codpedido, p.fk_motoboy_codmotoboy, (select m.nome from motoboy m where m.nome = 'Cachorro_Loko')
     From pedido p
 	Where p.fk_motoboy_codmotoboy in (select m.codmotoboy
-								  		from motoboy m
-								  		where m.nome = 'Jefferson')
-	
-select m.codmotoboy, m.nome
-       From motoboy m
-	   Where m.codmotoboy in (select p.fk_motoboy_codmotoboy
-							  from pedido p
-							  where m.nome = 'Jefferson')
+									 from motoboy m join pedido p
+									 on p.fk_motoboy_codmotoboy = m.codmotoboy
+									 where m.nome = 'Cachorro_Loko')									 
 
 
 

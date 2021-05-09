@@ -1,13 +1,3 @@
-select * from categoria; --ok
-select * from cliente; --ok
-select * from compoe; 
-select * from funcionario; --ok
-select * from motoboy; --ok
-select * from pedido; --ok
-select * from preparado; --ok
-select * from produto; --ok
-select * from telefone; --ok
-
 delete from categoria
 where codcategoria_pk = 7
 
@@ -88,15 +78,36 @@ where codcliente in (SELECT fk_cliente_codcliente
 					 WHERE cliente.codcliente = pedido.fk_cliente_codcliente)
 					 
 
+-- 01 visão que permita inserção
 CREATE OR REPLACE VIEW CadastroProduto AS
 SELECT fk_categoria_codcategoria_pk, nome, preco
 from produto
 
 INSERT INTO cadastroproduto values (6,'Caldo de Cana 400ml', 5.00)
 
-s
+CREATE OR REPLACE VIEW 
+
+-- 02 visões robustas (e.g., com vários joins) com justificativa semântica, de acordo com os requisitos da aplicação.
+-- View que permite filtrar os pedidos, nomes do clientes que fizeram o pedido, nome do motoboy que entregou
+-- o valor da taxa de entrega e o bairro que corresponde a taxa de entrega
+CREATE OR REPLACE VIEW PedidosMotoboy AS
+SELECT p.codpedido, c.nome nome_cliente, m.nome nome_motoboy, p.taxa_entrega, c.bairro
+from motoboy m join pedido p
+on m.codmotoboy = p.fk_motoboy_codmotoboy
+join cliente c 
+on c.codcliente = p.fk_cliente_codcliente
 
 
+
+select * from categoria; --ok
+select * from cliente; --ok
+select * from compoe; 
+select * from funcionario; --ok
+select * from motoboy; --ok
+select * from pedido; --ok
+select * from preparado; --ok
+select * from produto; --ok
+select * from telefone; --ok
 
 
 

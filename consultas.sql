@@ -123,6 +123,31 @@ select * from preparado; --ok
 select * from produto; --ok
 select * from telefone; --ok
 
+--create function to update the value of the order
+
+insert into compoe values(5,1,2)
+
+delete from compoe where fk_pedido_codpedido = 5 
+
+select p.preco * quantidade from compoe c inner join produto p on fk_produto_codproduto = codproduto;
+
+create or replace function TotalPedido(codpedido1 integer) returns void as $$
+	declare 
+	codpedid integer := codpedido1;
+	contador integer := 0;
+	--linhas cursor is select fk_pedido_codpedido from compoe where fk_pedido_codpedido = codpedid;
+	BEGIN
+	--for linha in linhas loop
+		contador = contador + (select sum( p.preco * quantidade ) from compoe c inner join produto p on fk_produto_codproduto = codproduto);
+	--end loop;
+	update pedido set valor = contador where codpedido = codpedid;
+	end; $$ LANGUAGE plpgsql;
+
+select TotalPedido(1);
+select * from pedido
+
+DROP FUNCTION totalpedido(integer)
+
 
 select valortotal(1)
 

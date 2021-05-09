@@ -107,10 +107,26 @@ on c.codcliente = p.fk_cliente_codcliente
 
 GRANT SELECT ON PedidosMotoboy TO atendente;
 
+-- Indice que melhora a busca quando relacionado a categoria 1 (pizza)
 CREATE INDEX idx_pizzas on produto (fk_categoria_codcategoria_pk) 
 WHERE fk_categoria_codcategoria_pk = '1';
 
-SHOW INDEX FROM produto
+explain analyze
+select *
+from produto
+WHERE fk_categoria_codcategoria_pk = '1';
+
+-- Indice que melhora a busca quando relacionado a preco de lanches abaixo de 8 reais
+CREATE INDEX idx_baratos on produto (preco) 
+WHERE preco < 8;
+
+explain analyze
+select *
+from produto
+WHERE preco < 8;
+
+--
+
 
 select * from idx_pizzas;
 select * from categoria; --ok

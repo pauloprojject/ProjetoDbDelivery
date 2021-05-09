@@ -40,5 +40,5 @@ update produto set preco = 5.0 where codproduto = 37;
 update produto set preco = 13.0 where codproduto = 38;
 update produto set preco = 12.0 where codproduto = 39;
 update produto set preco = 14.0 where codproduto = 40;
-update produto set preco = 20.0 where codproduto = 40;
+update produto set preco = 20.0 where codproduto = 41;
 

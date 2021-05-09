@@ -142,13 +142,25 @@ select * from telefone; --ok
 -- Procura por produtos com nome que começam com PIZZA e retorna a média do seu preço
 SELECT ROUND(AVG(preco), 2) AS media_preco FROM produto WHERE nome ILIKE 'PIZZA%'
 
--- POSSIVEL FUNÇÃO 
-CREATE OR REPLACE FUNCTION media(busca varchar)
-RETURNS DECIMAL AS $$
+-- Funcão que procura pela string fornecida na categoria e retorna o preço médio desta categoria
+CREATE OR REPLACE FUNCTION media_preco(busca varchar)
+RETURNS varchar AS $$
+DECLARE busca varchar = busca;
+DECLARE chave varchar = 
+			(SELECT ROUND(AVG(p.preco), 2)
+			FROM produto p JOIN categoria c
+			ON p.fk_categoria_codcategoria_pk = c.codcategoria_pk
+			WHERE c.categoria ILIKE busca);
 BEGIN
-	SELECT ROUND(AVG(preco), 2) AS MEDIA_PRECO FROM produto WHERE nome ILIKE CONCAT('ACAI', '%')
+	IF chave IS NOT null THEN
+		RETURN chave;
+	ELSE
+		RAISE EXCEPTION 'Esta categoria não existe: "%"', busca;
+	END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+select media_preco('aci')
 
 --create function to update the value of the order
 insert into compoe values(5,1,2)

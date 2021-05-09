@@ -123,8 +123,18 @@ select * from preparado; --ok
 select * from produto; --ok
 select * from telefone; --ok
 
---create function to update the value of the order
+-- Procura por produtos com nome que começam com PIZZA e retorna a média do seu preço
+SELECT ROUND(AVG(preco), 2) AS media_preco FROM produto WHERE nome ILIKE 'PIZZA%'
 
+-- POSSIVEL FUNÇÃO 
+CREATE OR REPLACE FUNCTION media(busca varchar)
+RETURNS DECIMAL AS $$
+BEGIN
+	SELECT ROUND(AVG(preco), 2) AS MEDIA_PRECO FROM produto WHERE nome ILIKE CONCAT('ACAI', '%')
+END;
+$$ LANGUAGE plpgsql;
+
+--create function to update the value of the order
 insert into compoe values(5,1,2)
 
 delete from compoe where fk_pedido_codpedido = 5 

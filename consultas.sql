@@ -127,6 +127,18 @@ WHERE preco < 8;
 
 --
 
+
+select * from idx_pizzas;
+select * from categoria; --ok
+select * from cliente; --ok
+select * from compoe; 
+select * from funcionario; --ok
+select * from motoboy; --ok
+select * from pedido; --ok
+select * from preparado; --ok
+select * from produto; --ok
+select * from telefone; --ok
+
 -- Procura por produtos com nome que começam com PIZZA e retorna a média do seu preço
 SELECT ROUND(AVG(preco), 2) AS media_preco FROM produto WHERE nome ILIKE 'PIZZA%'
 
@@ -160,17 +172,10 @@ create or replace function TotalPedido(codpedido1 integer) returns void as $$
 select TotalPedido(1);
 select * from pedido
 
-DROP FUNCTION totalpedido(integer)
+DROP FUNCTION CupomFiscal(integer)
 
 
-
-CREATE OR REPLACE FUNCTION media(busca varchar)
-RETURNS busca varchar AS $$
-DECLARE busca varchar;
-BEGIN
-	SELECT ROUND(AVG(preco), 2) AS MEDIA_PRECO FROM produto WHERE nome ILIKE CONCAT(busca, '%');
-END;
-$$ LANGUAGE plpgsql;
+select valortotal(1)
 
 select ped.codpedido as numero_do_pedido, prod.nome as Nome_do_produto, c.quantidade
 from compoe c inner join produto prod 
@@ -178,32 +183,54 @@ on fk_produto_codproduto = codproduto
 join pedido ped 
 on fk_pedido_codpedido = codpedido
 
-CREATE OR REPLACE FUNCTION media(busca varchar)
-RETURNS varchar AS $$
-DECLARE busca varchar = busca;
-BEGIN
-	RETURN (SELECT ROUND(AVG(p.preco), 2) AS MEDIA_PRECO 
-			FROM produto p join categoria c
-			on p.fk_categoria_codcategoria_pk = c.codcategoria_pk
-			WHERE c.categoria ILIKE busca);
-END;
-$$ LANGUAGE plpgsql;
+create or replace function CupomFiscal(codpedido1 integer) returns varchar as $$
+	Declare 
+		codpedid integer := codpedido1;
+		a1 varchar;
+		a2 varchar;
+		a3 varchar := '';
+		a4 varchar;
+		linhas cursor is select fk_pedido_codpedido from compoe where fk_pedido_codpedido = codpedid;
+	Begin
+		a1 = (select ped.codpedido
+		from compoe c inner join produto prod
+		on fk_produto_codproduto = codproduto
+		join pedido ped 
+		on fk_pedido_codpedido = codpedido
+		where ped.codpedido = codpedido1);
+		a2 = (select prod.nome
+		from compoe c inner join produto prod
+		on fk_produto_codproduto = codproduto
+		join pedido ped 
+		on fk_pedido_codpedido = codpedido
+		where ped.codpedido = codpedid);
+		for linha in linhas loop
+		a3 = a3 || '\nQuantidade: x' || (select c.quantidade
+		from compoe c inner join produto prod
+		on fk_produto_codproduto = codproduto
+		join pedido ped 
+		on fk_pedido_codpedido = codpedido
+		where ped.codpedido = codpedid);
+		end loop;
+		a4 = (select ped.valor
+		from compoe c inner join produto prod
+		on fk_produto_codproduto = codproduto
+		join pedido ped 
+		on fk_pedido_codpedido = codpedido
+		where ped.codpedido = codpedid);
+		
+		return 'Numero do pedido: ' || a1 || '\nNome do produto: ' || a2 || a3 || '\nPreco total: R$' || a4;
+	end; $$ LANGUAGE plpgsql;
+	
+	
+Do $$
+declare vbonus varchar;
+begin
+  vbonus = CupomFiscal(1);
+  raise notice 'Bonus = % ', vbonus;
+end $$;
+select CupomFiscal(1);
 
-select media('salgado')
 
-
-
-
-
-select * from idx_pizzas;
-select * from categoria; --ok
-select * from cliente; --ok
-select * from compoe; 
-select * from funcionario; --ok
-select * from motoboy; --ok
-select * from pedido; --ok
-select * from preparado; --ok
-select * from produto; --ok
-select * from telefone; --ok
 
 								  

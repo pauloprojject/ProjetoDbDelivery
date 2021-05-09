@@ -107,8 +107,12 @@ on c.codcliente = p.fk_cliente_codcliente
 
 GRANT SELECT ON PedidosMotoboy TO atendente;
 
+CREATE INDEX idx_pizzas on produto (fk_categoria_codcategoria_pk) 
+WHERE fk_categoria_codcategoria_pk = '1';
 
+SHOW INDEX FROM produto
 
+select * from idx_pizzas;
 select * from categoria; --ok
 select * from cliente; --ok
 select * from compoe; 
@@ -118,6 +122,11 @@ select * from pedido; --ok
 select * from preparado; --ok
 select * from produto; --ok
 select * from telefone; --ok
+
+
+select valortotal(1)
+
+
 
 
 

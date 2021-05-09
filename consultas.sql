@@ -127,18 +127,6 @@ WHERE preco < 8;
 
 --
 
-
-select * from idx_pizzas;
-select * from categoria; --ok
-select * from cliente; --ok
-select * from compoe; 
-select * from funcionario; --ok
-select * from motoboy; --ok
-select * from pedido; --ok
-select * from preparado; --ok
-select * from produto; --ok
-select * from telefone; --ok
-
 -- Procura por produtos com nome que começam com PIZZA e retorna a média do seu preço
 SELECT ROUND(AVG(preco), 2) AS media_preco FROM produto WHERE nome ILIKE 'PIZZA%'
 
@@ -175,10 +163,47 @@ select * from pedido
 DROP FUNCTION totalpedido(integer)
 
 
-select valortotal(1)
+
+CREATE OR REPLACE FUNCTION media(busca varchar)
+RETURNS busca varchar AS $$
+DECLARE busca varchar;
+BEGIN
+	SELECT ROUND(AVG(preco), 2) AS MEDIA_PRECO FROM produto WHERE nome ILIKE CONCAT(busca, '%');
+END;
+$$ LANGUAGE plpgsql;
+
+select ped.codpedido as numero_do_pedido, prod.nome as Nome_do_produto, c.quantidade
+from compoe c inner join produto prod 
+on fk_produto_codproduto = codproduto
+join pedido ped 
+on fk_pedido_codpedido = codpedido
+
+CREATE OR REPLACE FUNCTION media(busca varchar)
+RETURNS varchar AS $$
+DECLARE busca varchar = busca;
+BEGIN
+	RETURN (SELECT ROUND(AVG(p.preco), 2) AS MEDIA_PRECO 
+			FROM produto p join categoria c
+			on p.fk_categoria_codcategoria_pk = c.codcategoria_pk
+			WHERE c.categoria ILIKE busca);
+END;
+$$ LANGUAGE plpgsql;
+
+select media('salgado')
 
 
 
 
+
+select * from idx_pizzas;
+select * from categoria; --ok
+select * from cliente; --ok
+select * from compoe; 
+select * from funcionario; --ok
+select * from motoboy; --ok
+select * from pedido; --ok
+select * from preparado; --ok
+select * from produto; --ok
+select * from telefone; --ok
 
 								  

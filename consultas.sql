@@ -105,6 +105,8 @@ on t.fk_cliente_codcliente = c.codcliente
 join pedido p 
 on c.codcliente = p.fk_cliente_codcliente
 
+GRANT SELECT ON PedidosMotoboy TO atendente;
+
 
 
 select * from categoria; --ok

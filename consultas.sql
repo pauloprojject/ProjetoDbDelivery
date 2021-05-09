@@ -97,6 +97,14 @@ on m.codmotoboy = p.fk_motoboy_codmotoboy
 join cliente c 
 on c.codcliente = p.fk_cliente_codcliente
 
+-- View que permite saber o nome e o telefone de todos os clientes que fizeram os pedidos da casa
+CREATE OR REPLACE VIEW Tel_Clientes_Fidelizados AS
+SELECT p.codpedido, c.nome nome_cliente, t.fone
+from telefone t join cliente c
+on t.fk_cliente_codcliente = c.codcliente
+join pedido p 
+on c.codcliente = p.fk_cliente_codcliente
+
 
 
 select * from categoria; --ok

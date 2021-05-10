@@ -195,46 +195,42 @@ on fk_produto_codproduto = codproduto
 join pedido ped 
 on fk_pedido_codpedido = codpedido
 
-create or replace function CupomFiscal(codpedido1 integer) returns varchar as $$
+create or replace function CupomFiscal(codpedido1 integer) returns void as $$
 	Declare 
 		codpedid integer := codpedido1;
 		a1 varchar;
 		a2 varchar;
-		a3 varchar := '';
+		a3 varchar;
 		a4 varchar;
+		a5 varchar;
+		numero RECORD;
 		linhas cursor is select fk_pedido_codpedido from compoe where fk_pedido_codpedido = codpedid;
 	Begin
-		a1 = (select ped.codpedido
-		from compoe c inner join produto prod
-		on fk_produto_codproduto = codproduto
-		join pedido ped 
-		on fk_pedido_codpedido = codpedido
-		where ped.codpedido = codpedido1);
-		a2 = (select prod.nome
-		from compoe c inner join produto prod
-		on fk_produto_codproduto = codproduto
-		join pedido ped 
-		on fk_pedido_codpedido = codpedido
-		where ped.codpedido = codpedid);
-		for linha in linhas loop
-		a3 = a3 || '\nQuantidade: x' || (select c.quantidade
-		from compoe c inner join produto prod
-		on fk_produto_codproduto = codproduto
-		join pedido ped 
-		on fk_pedido_codpedido = codpedido
-		where ped.codpedido = codpedid);
-		end loop;
-		a4 = (select ped.valor
-		from compoe c inner join produto prod
-		on fk_produto_codproduto = codproduto
-		join pedido ped 
-		on fk_pedido_codpedido = codpedido
-		where ped.codpedido = codpedid);
+			select ped.codpedido, ped.valor into a1, a4
+			from compoe c inner join produto prod 
+			on fk_produto_codproduto = codproduto
+			join pedido ped 
+			on fk_pedido_codpedido = codpedido
+			where codpedido = codpedid;
+			
+			raise notice 'Numero do pedido: %', a1;
 		
-		return 'Numero do pedido: ' || a1 || '\nNome do produto: ' || a2 || a3 || '\nPreco total: R$' || a4;
+		for numero in select * from compoe c inner join produto prod 
+			on fk_produto_codproduto = codproduto
+			join pedido ped 
+			on fk_pedido_codpedido = codpedido
+			where codpedido = codpedid loop
+			
+		raise notice E'\nNome do produto: %\nQuantidade: %\nPreco individudal: % ', numero.nome, numero.quantidade, numero.preco;
+			
+		end loop;
+		
+		raise notice 'Preco total: %', a4;
+
 	end; $$ LANGUAGE plpgsql;
 	
-	
+insert into compoe values(40,1,1)
+
 Do $$
 declare vbonus varchar;
 begin

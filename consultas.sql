@@ -226,6 +226,9 @@ create or replace function CupomFiscal(codpedido1 integer) returns void as $$
 		end loop;
 		
 		raise notice 'Preco total: %', a4;
+		EXCEPTION
+			when NO_DATA_FOUND then
+				raise exception 'Entre um pedido válido';
 
 	end; $$ LANGUAGE plpgsql;
 	
@@ -234,10 +237,10 @@ insert into compoe values(40,1,1)
 Do $$
 declare vbonus varchar;
 begin
-  vbonus = CupomFiscal(1);
+  vbonus = CupomFiscal(10000);
   raise notice 'Bonus = % ', vbonus;
 end $$;
-select CupomFiscal(1);
+select CupomFiscal(2);
 
 
       
@@ -271,7 +274,7 @@ CREATE TRIGGER tg_atualizaestoque AFTER INSERT OR UPDATE OR DELETE ON compoe FOR
 
 insert into compoe values(5,3,1)
 
-insert into compoe values(1,3,1)
+insert into compoe values(1,3,4)
 insert into compoe values(45,2,5)
 select * from pedido
 
@@ -287,6 +290,9 @@ create or replace function atualizaestoque(codpedido1 integer) returns void as $
 	for percorre in (select * from compoe c inner join produto p on fk_produto_codproduto = p.codproduto where c.fk_pedido_codpedido = codpedid) loop
 		update produto set estoque = (percorre.estoque - percorre.quantidade) where percorre.fk_pedido_codpedido = codpedid and codproduto = percorre.fk_produto_codproduto;
 		raise notice '% atualizado', percorre.nome;
+		if percorre.estoque < 0 then
+			update produto set estoque = 0 where percorre.fk_pedido_codpedido = codpedid and codproduto = percorre.fk_produto_codproduto;
+		end if;
 	end loop;
 	
 	end; $$ LANGUAGE plpgsql;
@@ -299,6 +305,8 @@ drop trigger tg_atualizaestoque on compoe
 select * from produto
 select * from pedido
 select * from compoe
+
+
 
 select atualizaestoque(2)
 

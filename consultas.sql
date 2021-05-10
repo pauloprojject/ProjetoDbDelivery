@@ -39,7 +39,7 @@ SELECT p.estoque, p.nome
 FROM produto p JOIN categoria c
 ON p.fk_categoria_codcategoria_pk = c.codcategoria_pk
 GROUP BY p.estoque, p.nome, c.categoria
-having p.estoque > 30 AND c.categoria = 'Bebidas'
+HAVING p.estoque > 30 AND c.categoria = 'Bebidas'
 
 
 -- consulta usando alguma operação de conjunto (UNION, except ou intersect)

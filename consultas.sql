@@ -240,5 +240,65 @@ end $$;
 select CupomFiscal(1);
 
 
+      
+CREATE OR REPLACE FUNCTION valortotalpedido() RETURNS trigger AS $$
+BEGIN
+  update pedido
+     set valor = (select coalesce(sum(p.preco * quantidade),0)
+                    from compoe c
+                   inner join produto p on fk_produto_codproduto = codproduto
+                   where c.fk_pedido_codpedido = coalesce(new.fk_pedido_codpedido,old.fk_pedido_codpedido))
+   where codpedido = coalesce(new.fk_pedido_codpedido,old.fk_pedido_codpedido);
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER tg_totalpedido AFTER INSERT OR UPDATE OR DELETE ON compoe FOR EACH ROW EXECUTE PROCEDURE valortotalpedido();
+--estoque
+CREATE OR REPLACE FUNCTION atualizaestoque() RETURNS trigger AS $$
+BEGIN
+  update produto
+     set estoque = (select coalesce(sum(p.estoque - c.quantidade),0)
+                    from compoe c inner join produto p 
+					on c.fk_produto_codproduto = p.codproduto
+                   where c.fk_produto_codproduto = coalesce(new.fk_produto_codproduto,old.fk_produto_codproduto))
+   where codproduto = coalesce(new.fk_produto_codproduto,old.fk_produto_codproduto);
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER tg_atualizaestoque AFTER INSERT OR UPDATE OR DELETE ON compoe FOR EACH ROW EXECUTE PROCEDURE valortotalpedido();
+
+insert into compoe values(5,3,1)
+
+insert into compoe values(1,3,1)
+insert into compoe values(45,2,5)
+select * from pedido
+
+select * from produto
+
+
+
+
+
+
+drop trigger tg_atualizaestoque on compoe
+
+select * from produto
+select * from pedido
+select * from compoe
+
+
+delete from compoe
+where fk_pedido_codpedido <> 1
+
+
+
+
+    
+    
+  
+  
+
 
 								  

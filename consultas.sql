@@ -1,6 +1,3 @@
-delete from categoria
-where codcategoria_pk = 7
-
 -- b) ii 01 consulta usando between
 select * 
 from funcionario 
@@ -23,6 +20,7 @@ from produto p inner join categoria c
 on p.fk_categoria_codcategoria_pk = c.codcategoria_pk
 where c.categoria = 'Pizza'
 
+-- 01 consulta com left/right/full outer join na cláusula FROM
 --Selecione os clientes que ainda não tem pedido
 select c.codcliente, c.nome, p.codpedido
 from cliente c left join pedido p
@@ -78,14 +76,13 @@ where codcliente in (SELECT fk_cliente_codcliente
 					 WHERE cliente.codcliente = pedido.fk_cliente_codcliente)
 					 
 
+-- c. Visões:
 -- 01 visão que permita inserção
 CREATE OR REPLACE VIEW CadastroProduto AS
 SELECT fk_categoria_codcategoria_pk, nome, preco
 from produto
 
 INSERT INTO cadastroproduto values (6,'Caldo de Cana 400ml', 5.00)
-
-CREATE OR REPLACE VIEW 
 
 -- 02 visões robustas (e.g., com vários joins) com justificativa semântica, de acordo com os requisitos da aplicação.
 -- View que permite filtrar os pedidos, nomes do clientes que fizeram o pedido, nome do motoboy que entregou
@@ -105,7 +102,14 @@ on t.fk_cliente_codcliente = c.codcliente
 join pedido p 
 on c.codcliente = p.fk_cliente_codcliente
 
+
+-- Prover acesso a uma das visões para consulta para o usuário 02 (criado).
 GRANT SELECT ON PedidosMotoboy TO atendente;
+
+
+-- d. Índices
+--03 índices para campos indicados (além dos referentes às PKs) com justificativa dentro
+-- do contexto das consultas formuladas na questão 3b.
 
 -- Indice que melhora a busca quando relacionado a categoria 1 (pizza)
 CREATE INDEX idx_pizzas on produto (fk_categoria_codcategoria_pk) 
@@ -125,23 +129,35 @@ select *
 from produto
 WHERE preco < 8;
 
---
+-- Indice que busca somente por produtos que tenha a quantidade menor que 10 na composição dos pedidos
+explain analyze
+select * from compoe
+
+CREATE INDEX idx_qtd_produto on compoe (quantidade) 
+WHERE quantidade < 10;
+
+explain analyze
+select * from compoe
+
+ 
+-- e. Reescrita de consultas
+--Identificar 02 exemplos de consultas dentro do contexto da aplicação (questão
+--3.b) que possam e devam ser melhoradas. Reescrevê-las. Justificar a reescrita.
+-- Nome de todos os pedidos que aparece o motoboy 'Cachorro_Loko' 
+select p.codpedido, p.fk_motoboy_codmotoboy, m.nome
+    From pedido p join motoboy m
+	on m.codmotoboy = p.fk_motoboy_codmotoboy
+	where m.nome = 'Cachorro_Loko'
 
 
-select * from idx_pizzas;
-select * from categoria; --ok
-select * from cliente; --ok
-select * from compoe; 
-select * from funcionario; --ok
-select * from motoboy; --ok
-select * from pedido; --ok
-select * from preparado; --ok
-select * from produto; --ok
-select * from telefone; --ok
+-- Retorne os dados de todos os clientes que já fizeram pedidos 
+SELECT codcliente, nome, rua, bairro, numero 
+from cliente c join pedido p
+on c.codcliente = p.fk_cliente_codcliente
 
--- Procura por produtos com nome que começam com PIZZA e retorna a média do seu preço
-SELECT ROUND(AVG(preco), 2) AS media_preco FROM produto WHERE nome ILIKE 'PIZZA%'
+-- f. Funções ou procedures armazenadas:
 
+-- 01 função que use SUM, MAX, MIN, AVG ou COUNT
 -- Funcão que procura pela string fornecida na categoria e retorna o preço médio desta categoria
 CREATE OR REPLACE FUNCTION media_preco(busca varchar)
 RETURNS varchar AS $$
@@ -160,41 +176,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-select media_preco('aci')
+select media_preco('acai')
 
---create function to update the value of the order
-insert into compoe values(5,1,2)
+-- Populando a tabela compoe
+insert into compoe values(40,1,1)
+insert into compoe values(1,1,1)
+insert into compoe values(43,1,1)
 
-delete from compoe where fk_pedido_codpedido = 5 
+insert into compoe values(5,2,1)
+insert into compoe values(7,2,2)
 
-select p.preco * quantidade from compoe c inner join produto p on fk_produto_codproduto = codproduto;
-
-create or replace function TotalPedido(codpedido1 integer) returns void as $$
-	declare 
-	codpedid integer := codpedido1;
-	contador integer := 0;
-	--linhas cursor is select fk_pedido_codpedido from compoe where fk_pedido_codpedido = codpedid;
-	BEGIN
-	--for linha in linhas loop
-		contador = contador + (select sum( p.preco * quantidade ) from compoe c inner join produto p on fk_produto_codproduto = codproduto);
-	--end loop;
-	update pedido set valor = contador where codpedido = codpedid;
-	end; $$ LANGUAGE plpgsql;
-
-select TotalPedido(1);
-select * from pedido
-
-DROP FUNCTION CupomFiscal(integer)
-
-
-select valortotal(1)
-
-select ped.codpedido as numero_do_pedido, prod.nome as Nome_do_produto, c.quantidade
-from compoe c inner join produto prod 
-on fk_produto_codproduto = codproduto
-join pedido ped 
-on fk_pedido_codpedido = codpedido
-
+-- Função que retorna todos os itens de um pedido, sua quantidade e o valor individual de cada produto
 create or replace function CupomFiscal(codpedido1 integer) returns void as $$
 	Declare 
 		codpedid integer := codpedido1;
@@ -228,16 +220,18 @@ create or replace function CupomFiscal(codpedido1 integer) returns void as $$
 		raise notice 'Preco total: %', a4;
 
 	end; $$ LANGUAGE plpgsql;
-	
-insert into compoe values(40,1,1)
 
+-- Rodar com bloco anônimo
 Do $$
 declare vbonus varchar;
 begin
-  vbonus = CupomFiscal(1);
-  raise notice 'Bonus = % ', vbonus;
+  vbonus = CupomFiscal(1);  
 end $$;
+
+-- Ou também rodar ela usando o select
 select CupomFiscal(1);
+
+-- DROP FUNCTION CupomFiscal(integer)
 
 
       
@@ -290,23 +284,6 @@ create or replace function atualizaestoque(codpedido1 integer) returns void as $
 	end loop;
 	
 	end; $$ LANGUAGE plpgsql;
-
-select p.estoque - c.quantidade from compoe c inner join produto p on fk_produto_codproduto = p.codproduto where c.fk_pedido_codpedido = cod
-
-
-drop trigger tg_atualizaestoque on compoe
-
-select * from produto
-select * from pedido
-select * from compoe
-
-select atualizaestoque(2)
-
-delete from compoe
-where fk_pedido_codpedido <> 1
-
-
-select current_user
 
 
 

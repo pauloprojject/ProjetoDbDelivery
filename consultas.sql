@@ -277,9 +277,21 @@ select * from pedido
 
 select * from produto
 
+create or replace function atualizaestoque(codpedido1 integer) returns void as $$
+	declare 
+	codpedid integer := codpedido1;
+	contador integer := 0;
+	percorre RECORD;
+	--linhas cursor is select fk_pedido_codpedido from compoe where fk_pedido_codpedido = codpedid;
+	BEGIN
+	for percorre in (select * from compoe c inner join produto p on fk_produto_codproduto = p.codproduto where c.fk_pedido_codpedido = codpedid) loop
+		update produto set estoque = (percorre.estoque - percorre.quantidade) where percorre.fk_pedido_codpedido = codpedid and codproduto = percorre.fk_produto_codproduto;
+		raise notice '% atualizado', percorre.nome;
+	end loop;
+	
+	end; $$ LANGUAGE plpgsql;
 
-
-
+select p.estoque - c.quantidade from compoe c inner join produto p on fk_produto_codproduto = p.codproduto where c.fk_pedido_codpedido = cod
 
 
 drop trigger tg_atualizaestoque on compoe
@@ -288,12 +300,13 @@ select * from produto
 select * from pedido
 select * from compoe
 
+select atualizaestoque(2)
 
 delete from compoe
 where fk_pedido_codpedido <> 1
 
 
-
+select current_user
 
     
     

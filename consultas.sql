@@ -308,6 +308,80 @@ where fk_pedido_codpedido <> 1
 
 select current_user
 
+
+
+--03 diferentes triggers com justificativa semântica, de acordo com os requisitos da aplicação.
+
+--Primeira Trigger atualização de preço conforme for fazendo a inserção dos itens na tabela pedido
+CREATE OR REPLACE FUNCTION valortotalpedido() RETURNS trigger AS $$
+BEGIN
+  update pedido
+     set valor = (select coalesce(sum(p.preco * quantidade),0)
+                    from compoe c
+                   inner join produto p on fk_produto_codproduto = codproduto
+                   where c.fk_pedido_codpedido = coalesce(new.fk_pedido_codpedido,old.fk_pedido_codpedido))
+   where codpedido = coalesce(new.fk_pedido_codpedido,old.fk_pedido_codpedido);
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER tg_totalpedido AFTER INSERT OR UPDATE OR DELETE ON compoe FOR EACH ROW EXECUTE PROCEDURE valortotalpedido();
+
+
+--Segunda Trigger criação da tabela log para monitorar quem for fazendo qualquer atualização na tabela pedido
+create table 
+pedLog 
+(usuario varchar(20), operacao varchar(10), dataHora timestamp);
+
+DROP TABLE PEDLOG
+
+-- Gera log
+CREATE OR REPLACE FUNCTION geraLogDelivery() 
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO PedLog  (usuario, operacao, dataHora)  
+       VALUES (current_user, tg_op, current_timestamp); 
+    RETURN NEW; 
+END; 
+$$ LANGUAGE plpgsql; 
+
+CREATE TRIGGER tg_geraLogDelivery AFTER UPDATE or INSERT or DELETE 
+  ON pedido FOR EACH ROW 
+  EXECUTE PROCEDURE geraLogDelivery();
+  
+select * from pedido; 
+select * from PedLog;
+
+INSERT INTO pedido (fk_cliente_codcliente, fk_motoboy_codmotoboy, fk_funcionario_codfuncionario, data, status, taxa_entrega)
+					VALUES (2, 2,1,current_timestamp, 'Em preparo', 8.00);
+
+update pedido
+SET fk_motoboy_codmotoboy = 2
+where codpedido = 6
+
+select * from pedido; 
+select * from PedLog;
+
+
+--Terceira Trigger. Manda mensagem de alerta sempre que um preço for atualizado na tabela produto
+Create or Replace Function atualizapreco()
+Returns trigger as $$
+declare msg varchar(40);
+Begin
+  msg = 'Preco antigo '||old.preco|| ' atualizou para '||new.preco;
+  raise notice 'O preço foi alterado: %',msg;
+  return null;
+End;
+$$ LANGUAGE plpgsql; 
+CREATE TRIGGER tg_atualizapreco AFTER UPDATE
+  of preco ON produto FOR EACH ROW EXECUTE PROCEDURE atualizapreco();
+
+select * from produto;
+
+update produto set preco = 1 where codproduto = 42;
+
+select * from produto
+
     
     
   

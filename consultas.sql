@@ -359,7 +359,23 @@ UPDATE produto SET preco = 1 WHERE codproduto = 42;
 SELECT * FROM produto
 
     
-    
+select * from telefone
+
+create or replace function NumeroCliente(codCliente1 integer) returns varchar as $$
+	declare
+		codcli integer := codcliente1;
+		retorno varchar;
+	BEGIN
+		select fone into retorno from telefone where fk_cliente_codcliente = codcli;
+		if retorno is null then
+			raise exception 'insira codigo de cliente valido';
+		else
+			return retorno;
+		end if;
+	End;
+$$ LANGUAGE plpgsql;
+ 
+select NumeroCliente(1);
   
   
 

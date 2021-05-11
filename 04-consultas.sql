@@ -60,12 +60,12 @@ ORDER BY Identidade
 
 -- 02 consultas que usem subqueries.
 -- Retorna uma consulta usando subquery dos pedidos que o motoboy 'Cachorro_Loko' entregou	
-SELECT p.codpedido, p.fk_motoboy_codmotoboy, (SELECT m.nome FROM motoboy m WHERE m.nome = 'Cachorro_Loko')
+SELECT p.codpedido, p.fk_motoboy_codmotoboy, (SELECT m.nome FROM motoboy m WHERE m.nome = 'Pedro')
     FROM pedido p
 	WHERE p.fk_motoboy_codmotoboy IN (SELECT m.codmotoboy
 									 FROM motoboy m JOIN pedido p
 									 ON p.fk_motoboy_codmotoboy = m.codmotoboy
-									 WHERE m.nome = 'Cachorro_Loko')	
+									 WHERE m.nome = 'Pedro')	
 									 
 
 -- Retorna os dados de todos os clientes que JÁ fizeram pedidos
@@ -82,7 +82,9 @@ CREATE OR REPLACE VIEW CadastroProduto AS
 SELECT fk_categoria_codcategoria_pk, nome, preco
 FROM produto
 
-INSERT INTO cadastroproduto values (6,'Caldo de Cana 400ml', 5.00)
+INSERT INTO cadastroproduto VALUES (4,'Petit Gateau', 15.00)
+
+SELECT * FROM Produto;
 
 -- 02 visões robustas (e.g., com vários joins) com justificativa semântica, de acordo com os requisitos da aplicação.
 -- View que permite filtrar os pedidos, nomes do clientes que fizeram o pedido, nome do motoboy que entregou
@@ -94,6 +96,8 @@ ON m.codmotoboy = p.fk_motoboy_codmotoboy
 JOIN cliente c 
 ON c.codcliente = p.fk_cliente_codcliente
 
+SELECT * FROM PedidosMotoboy;
+
 -- View que permite saber o nome e o telefone de todos os clientes que fizeram os pedidos da casa
 CREATE OR REPLACE VIEW Tel_Clientes_Fidelizados AS
 SELECT p.codpedido, c.nome nome_cliente, t.fone
@@ -101,6 +105,8 @@ FROM telefone t JOIN cliente c
 ON t.fk_cliente_codcliente = c.codcliente
 JOIN pedido p 
 ON c.codcliente = p.fk_cliente_codcliente
+
+SELECT * FROM Tel_Clientes_Fidelizados;
 
 -- Prover acesso a uma das visões para consulta para o usuário 02 (criado).
 GRANT SELECT ON PedidosMotoboy TO atendente;
@@ -119,7 +125,7 @@ FROM produto
 WHERE fk_categoria_codcategoria_pk = '1';
 
 -- Índice que melhora a busca quando relacionado a preco de lanches abaixo de 8 reais
-CREATE INDEX idx_baratos ON produto (preco) 
+CREATE INDEX idx_baratos ON produto(preco) 
 WHERE preco < 8;
 
 EXPLAIN ANALYZE
@@ -131,22 +137,21 @@ WHERE preco < 8;
 EXPLAIN ANALYZE
 SELECT * FROM compoe
 
-CREATE INDEX idx_qtd_produto ON compoe (quantidade) 
+CREATE INDEX idx_qtd_produto ON compoe(quantidade) 
 WHERE quantidade < 10;
 
 EXPLAIN ANALYZE
 SELECT * FROM compoe
 
- 
 -- E. Reescrita de consultas:
 -- Identificar 02 exemplos de consultas dentro do contexto da aplicação 
 -- que possam e devam ser melhoradas. Reescrevê-las. Justificar a reescrita.
 
--- Nome de todos os pedidos que aparece o motoboy 'Cachorro_Loko' 
+-- Nome de todos os pedidos que aparece o motoboy 'Pedro' 
 SELECT p.codpedido, p.fk_motoboy_codmotoboy, m.nome
     FROM pedido p JOIN motoboy m
 	ON m.codmotoboy = p.fk_motoboy_codmotoboy
-	WHERE m.nome = 'Cachorro_Loko'
+	WHERE m.nome = 'Pedro'
 
 
 -- Retorne os dados de todos os clientes que já fizeram pedidos 
@@ -155,7 +160,6 @@ FROM cliente c JOIN pedido p
 ON c.codcliente = p.fk_cliente_codcliente
 
 -- F. Funções ou procedures armazenadas:
-
 -- Função que procura pelo número do cliente pelo seu ID
 CREATE OR REPLACE FUNCTION NumeroCliente(codCliente1 integer) RETURNS varchar AS $$
 	DECLARE
@@ -171,7 +175,7 @@ CREATE OR REPLACE FUNCTION NumeroCliente(codCliente1 integer) RETURNS varchar AS
 	END;
 $$ LANGUAGE plpgsql;
  
-SELECT NumeroCliente(8);
+SELECT NumeroCliente(9);
 
 -- Função que procura pela string fornecida na categoria e retorna o preço médio desta categoria
 CREATE OR REPLACE FUNCTION media_preco(busca varchar)
@@ -192,18 +196,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 SELECT media_preco('acai')
-
--- Populando a tabela compoe
-INSERT INTO compoe values(40,1,1)
-INSERT INTO compoe values(1,1,1)
-INSERT INTO compoe values(43,1,1)
-
-INSERT INTO compoe values(5,2,1)
-INSERT INTO compoe values(7,2,2)
-
-INSERT INTO compoe values(5,3,1)
-INSERT INTO compoe values(1,3,1)
-INSERT INTO compoe values(45,2,5)
+SELECT media_preco('alcoolicos')
 
 -- Função que retorna todos os itens de um pedido, sua quantidade e o valor individual de cada produto
 CREATE OR REPLACE function CupomFiscal(codpedido1 integer) RETURNS void AS $$
@@ -252,10 +245,13 @@ CREATE OR REPLACE function atualizaestoque(codpedido1 integer) RETURNS void AS $
 END; 
 $$ LANGUAGE plpgsql
 
+SELECT * FROM PEDIDO
+
+
 -- Rodar com bloco anônimo...
-Do $$
+DO $$
 DECLARE cupom_pedido varchar;
-begin
+BEGIN
   cupom_pedido = CupomFiscal(1);  
 END $$;
 
@@ -263,8 +259,7 @@ END $$;
 SELECT CupomFiscal(1);
 
 -- TRIGGERS:
-
--- 01 - Retorna o valor total do pedido sempre que é feita qualquer alteração na tabela COMPOE
+-- 01 - Retorna o valor total do pedido sempre que é feita qualquer alteração na tabela
 CREATE OR REPLACE FUNCTION valortotalpedido() RETURNS TRIGGER AS $$
 BEGIN
   UPDATE pedido
@@ -324,10 +319,26 @@ CREATE TRIGGER tg_atualizapreco AFTER UPDATE OF preco ON produto FOR EACH ROW EX
 
 SELECT * FROM produto;
 
-UPDATE produto SET preco = 1 WHERE codproduto = 42;
+UPDATE produto SET preco = 666 WHERE codproduto = 10;
 
-SELECT * FROM produto
-  
+SELECT * FROM produto;
+
+-- Populando a tabela compoe
+INSERT INTO compoe values(40,1,1);
+INSERT INTO compoe values(1,1,1);
+INSERT INTO compoe values(39,1,1);
+
+INSERT INTO compoe values(5,2,1);
+INSERT INTO compoe values(7,2,2);
+
+INSERT INTO compoe values(5,3,1);
+INSERT INTO compoe values(1,3,1);
+INSERT INTO compoe values(7,2,5);
+INSERT INTO compoe values(3,2,5);
+INSERT INTO compoe values(1,3,1);
+
+SELECT * FROM PEDIDO
+ 
   
 
 

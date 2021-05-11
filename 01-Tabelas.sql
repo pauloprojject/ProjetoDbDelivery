@@ -8,10 +8,9 @@ CREATE TABLE public.funcionario
     funcao character varying COLLATE pg_catalog."default",
     salario numeric,
     codgerente integer,
-    valortotal numeric,
     CONSTRAINT funcionario_pkey PRIMARY KEY (codfuncionario),
     CONSTRAINT salariopositivo CHECK (salario > 0::numeric)
-)
+);
 
 
 CREATE TABLE public.cliente
@@ -27,7 +26,7 @@ CREATE TABLE public.cliente
     CONSTRAINT cliente_pkey PRIMARY KEY (codcliente),
     CONSTRAINT cliente_codcliente_rg_cpf_key UNIQUE (codcliente, rg, cpf),
     CONSTRAINT tamanhocpf CHECK (length(cpf::text) = 11)
-)
+);
 
 
 CREATE TABLE public.telefone
@@ -41,7 +40,7 @@ CREATE TABLE public.telefone
         REFERENCES public.cliente (codcliente) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
-)
+);
 
 
 CREATE TABLE public.motoboy
@@ -49,14 +48,14 @@ CREATE TABLE public.motoboy
     codmotoboy integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     nome character varying COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT motoboy_pkey PRIMARY KEY (codmotoboy)
-)
+);
 
 CREATE TABLE public.categoria
 (
     codcategoria_pk integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     categoria character varying COLLATE pg_catalog."default",
     CONSTRAINT categoria_pkey PRIMARY KEY (codcategoria_pk)
-)
+);
 
 CREATE TABLE public.produto
 (
@@ -70,7 +69,7 @@ CREATE TABLE public.produto
         REFERENCES public.categoria (codcategoria_pk) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
-)
+);
 
 CREATE TABLE public.pedido
 (
@@ -95,7 +94,7 @@ CREATE TABLE public.pedido
         REFERENCES public.funcionario (codfuncionario) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE CASCADE
-)
+);
 
 CREATE TABLE public.compoe
 (
@@ -110,7 +109,7 @@ CREATE TABLE public.compoe
         REFERENCES public.pedido (codpedido) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE RESTRICT
-)
+);
 
 CREATE TABLE public.preparado
 (
@@ -124,4 +123,4 @@ CREATE TABLE public.preparado
         REFERENCES public.pedido (codpedido) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE SET NULL
-)
+);

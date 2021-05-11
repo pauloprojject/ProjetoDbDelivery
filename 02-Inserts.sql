@@ -1,9 +1,9 @@
-INSERT INTO funcionario (nome, funcao, salario) VALUES 
-	('Joao Jorge', 'Atendente',1200), 
-	('Jorge Pimentel', 'Atendente',1200),
-	('Guaraci Benito', 'Servico Gerais',1200),
-	('Flaviano Braga', 'Cozinheiro',1500),
-	('Rayme Carvalho', 'Gerente',3200)
+INSERT INTO funcionario (nome, funcao, salario, codgerente) VALUES 
+	('Joao Jorge', 'Atendente', 2000, 1), 
+	('Jorge Pimentel', 'Atendente', 2000, 1),
+	('Guaraci Benito', 'Servico Gerais', 1500, 1),
+	('Flaviano Braga', 'Cozinheiro', 2500, 1),
+	('Rayme Carvalho', 'Gerente', 5000, null);
 	
 select * from funcionario
 
@@ -24,12 +24,11 @@ INSERT INTO telefone (fone, fk_cliente_codcliente, tipo) VALUES (83988887733,5,'
 
 select * from telefone;
 
-INSERT INTO motoboy (nome) VALUES ('Jefferson')
-INSERT INTO motoboy (nome) VALUES ('Cachorro_Loko')
-INSERT INTO motoboy (nome) VALUES ('Moleque_du_Grau')
+INSERT INTO motoboy (nome) VALUES ('Jefferson');
+INSERT INTO motoboy (nome) VALUES ('Pedro');
+INSERT INTO motoboy (nome) VALUES ('Jonas');
 
 select * from motoboy;
-
 
 INSERT INTO Categoria (categoria) VALUES 
 	('Pizza'), 
@@ -127,6 +126,7 @@ update produto set preco = 5.0 where codproduto = 37;
 update produto set preco = 13.0 where codproduto = 38;
 update produto set preco = 12.0 where codproduto = 39;
 update produto set preco = 14.0 where codproduto = 40;
+update produto set preco = 25.0 where codproduto = 41;
 
 INSERT INTO 
 pedido (fk_cliente_codcliente, fk_motoboy_codmotoboy, fk_funcionario_codfuncionario, data, status, taxa_entrega) 
@@ -151,6 +151,6 @@ INSERT INTO preparado (fk_funcionario_codfuncionario, fk_pedido_codpedido) VALUE
 INSERT INTO preparado (fk_funcionario_codfuncionario, fk_pedido_codpedido) VALUES (1,4);
 INSERT INTO preparado (fk_funcionario_codfuncionario, fk_pedido_codpedido) VALUES (1,5);
 
-
+SELECT * FROM PRODUTO
 
 
